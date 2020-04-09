@@ -6,7 +6,7 @@ DremDOS is a basic disk operating system that is built with COSMOS, a set of bui
 <img src="https://raw.githubusercontent.com/sparrdrem/dremdos/master/docs/0.0.1-RC1.PNG" />
 
 ## DremDOS's Features
-DremDOS is currently very basic and is unable to do much. It can't even do some basic disk management things (due to bugs or, in the case of copying and moving, because they are not yet implimented. Maybe in 0.0.1-RC2) or load external programs. 
+DremDOS is currently very basic and is unable to do much. It can't even do some basic disk management things (due to bugs or, in the case of copying and moving, because they are not yet implimented. Maybe in 0.0.1-RC2) or load external programs.<br />
 However, these are it's current features:
 
 - Create and delete directories
@@ -30,7 +30,7 @@ Building DremDOS is simple.
 2. Download this repository and copy everything in the "src" folder to a new folder named DremDOS\*\*\*. It should be located at `C:\Users\[your username]\sources\repos\DremDOS`.
 3. Open the project in Visual Studio 2019. Modify it as you like and build it. The ISO will be outputted in the `PATH\TO\DremDOS\DremDOS\bin\Debug\netcoreapp2.0\cosmos` folder and be named `DremDOS.iso`.
 
-\*\* DevKit is technically not required right now, but will be required in a later release.
+\*\* DevKit is technically not required right now, but will be required in a later release.<br />
 \*\*\* This is only needed if you want to edit DremDOS as your own. If you just want to build it, you should be able to just open the solution file and build it. This is untested, though.
 
 Better documentation coming soon.
