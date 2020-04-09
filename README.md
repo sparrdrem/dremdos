@@ -1,4 +1,5 @@
 # DremDOS
-"Alright, our last operating system idea didn't work. Let's try this again..."
 
-Now that we have C, we can really get some stuff done.
+DremDOS is built with COSMOS. To build it, please go to [their website](https://www.gocosmos.org/download/) and install the UserKit and DevKit.
+
+Better documentation coming soon.
