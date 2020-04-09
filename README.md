@@ -24,9 +24,13 @@ However, these are it's current features:
 \*It seems COSMOS only supports one drive though. Technically the code should allow DremDOS to see multiple drives once the filesystem/hard drive drivers are fully implimented.
 
 ## Building DremDOS
-To build it, please go to [their website](https://www.gocosmos.org/download/) and install the UserKit and DevKit\*\*.
+Building DremDOS is simple.
+
+1. Go to [COSMOS's website](https://www.gocosmos.org/download/) and install the UserKit and DevKit\*\*. Every prerequisite there is a prerequisite for DremDOS!
+2. Download this repository and copy everything in the "src" folder to a new folder named DremDOS\*\*\*. It should be located at `C:\Users\[your username]\sources\repos\DremDOS`.
+3. Open the project in Visual Studio 2019. Modify it as you like and build it. The ISO will be outputted in the `PATH\TO\DremDOS\DremDOS\bin\Debug\netcoreapp2.0\cosmos` folder and be named `DremDOS.iso`.
 
 \*\* DevKit is technically not required right now, but will be required in a later release.
-
+\*\*\* This is only needed if you want to edit DremDOS as your own. If you just want to build it, you should be able to just open the solution file and build it. This is untested, though.
 
 Better documentation coming soon.
