@@ -1,5 +1,4 @@
-# DremDOS
-## DremDOS - a tiny disk operating system built with COSMOS
+# DremDOS - a tiny disk operating system built with COSMOS
 
 ## What is DremDOS?
 DremDOS is a basic disk operating system that is built with COSMOS, a set of building blocks to make operating systems with high-level programming languages such as C#, VB, F#, etc.
