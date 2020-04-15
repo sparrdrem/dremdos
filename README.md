@@ -13,12 +13,14 @@ However, these are it's current features:
 - List directory contents
 - Change the current directory
 - Create and edit files with Kitty, which is not a reference to the Linux command "cat" at all
+- Copy and move files
 - Delete files
 - Clear the screen
 - Check the time
 - Calculate basic math problems
 - The ability to use every CPU cycle to beep
 - List all\* connected drives
+- A very basic GUI (with a mouse driver). Thanks SparrOSDeveloperTeam!
 - Shut down the computer once you're bored of it
 
 \*It seems COSMOS only supports one drive though. Technically the code should allow DremDOS to see multiple drives once the filesystem/hard drive drivers are fully implimented.
