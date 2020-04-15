@@ -8,7 +8,7 @@ namespace DremDOS
 {
     public class Kernel : Sys.Kernel
     {
-        string _osVersion = "0.0.1-RC1";
+        string _osVersion = "0.0.1";
         protected override void BeforeRun()
         {
             // Initialize filesystems
@@ -20,16 +20,25 @@ namespace DremDOS
             // The sound is totally not a reference to the Commodore PET
             Console.Beep(4000, 100);
             Console.Beep(8000, 100);
+            Console.ForegroundColor = ConsoleColor.Red;
             Console.WriteLine("    ___                ___  ____  ____  ");
             Console.Beep(4000, 100);
             Console.Beep(8000, 100);
+            Console.ForegroundColor = ConsoleColor.Yellow;
             Console.WriteLine("   / _ \\_______ __ _  / _ \\/ __ \\/ __/ ");
             Console.Beep(4000, 100);
             Console.Beep(8000, 100);
+            Console.ForegroundColor = ConsoleColor.Green;
             Console.WriteLine("  / // / __/ -_)  ' \\/ // / /_/ /\\ \\  ");
             Console.Beep(4000, 100);
             Console.Beep(8000, 100);
+            Console.ForegroundColor = ConsoleColor.Blue;
             Console.WriteLine(" /____/_/  \\__/_/_/_/____/\\____/___/ ");
+            Console.ForegroundColor = ConsoleColor.Red;
+            Console.WriteLine("\nNOTICE: THIS SOFTWARE IS PROVIDED AS-IS AND INCLUDES ABSOLUTELY NO WARRENTY. ANY DAMAGE TO YOUR DEVICE AND/OR DATA IS ON YOU!");
+            Console.ForegroundColor = ConsoleColor.DarkRed;
+            Console.WriteLine("YOU HAVE BEEN WARNED!");
+            Console.ForegroundColor = ConsoleColor.White;
             // Display OS information
             Command();
         }
@@ -70,15 +79,15 @@ namespace DremDOS
             }
             else if (command == "dir")
             {
-                Dir();
+                DirectoryListing.Dir();
             }
             else if (command == "drivelist")
             {
-                Drivelist();
+                Drives.Drivelist();
             }
             else if (command == "cd")
             {
-                Cd(arguments);
+                DirectoryOperations.Cd(arguments);
             }
             else if (command == "checktime")
             {
@@ -86,7 +95,7 @@ namespace DremDOS
             }
             else if (command == "calculate")
             {
-                Calculate(arguments);
+                Calculator.Calculate(arguments);
             }
             else if (command == "shutdown")
             {
@@ -95,23 +104,35 @@ namespace DremDOS
                 Console.Beep(1318, 200);
                 Console.Beep(880, 200);
                 Console.Beep(987, 300);
-                Shutdown(arguments);
+                PowerOperations.Shutdown(arguments);
             }
             else if (command == "kitty")
             {
-                Kitty(arguments);
+                Kitty.kitty(arguments);
             }
             else if (command == "rm")
             {
-                removeFile(arguments);
+                FileOperations.removeFile(arguments);
             }
             else if (command == "rmdir")
             {
-                removeDirectory(arguments);
+                DirectoryOperations.removeDirectory(arguments);
             }
             else if (command == "mkdir")
             {
-                createDirectory(arguments);
+                DirectoryOperations.createDirectory(arguments);
+            }
+            else if (command == "copy")
+            {
+                FileOperations.copyFile(arguments);
+            }
+            else if (command == "move")
+            {
+                FileOperations.moveFile(arguments);
+            }
+            else if (command == "initgui")
+            {
+                DesktopEnvironment.InitGUI(arguments);
             }
             else // Else, say it's a bad command.
             {
@@ -188,369 +209,13 @@ namespace DremDOS
             }
         }
 
-        protected void Dir()
-        {
-            Console.Write("Directory listing of " + Directory.GetCurrentDirectory() + "\n\n");
-            string[] directories = GetDirectories(Directory.GetCurrentDirectory());
-            string[] files = GetFiles(Directory.GetCurrentDirectory());
-
-            for (int i = 0; i < directories.Length; i++)
-            {
-                Console.Write("[" + directories[i] + "]\n");
-            }
-
-            for (int i = 0; i < files.Length; i++)
-            {
-                Console.Write(files[i] + "\n");
-            }
-        }
-
-        protected void Cd(string[] arguments)
-        {
-            if (arguments.Length > 0)
-            {
-                ChangeDirectory(arguments[0]);
-            }
-            else
-            {
-                ChangeDirectory(null);
-            }
-        }
-        protected void Drivelist()
-        {
-            DriveInfo[] drives = DriveInfo.GetDrives();
-
-            foreach (DriveInfo d in drives)
-            {
-                Console.WriteLine("Drive {0}", d.Name);
-                Console.WriteLine("  Drive type: {0}", d.DriveType);
-                if (d.IsReady == true)
-                {
-                    Console.WriteLine("  Volume label: {0}", d.VolumeLabel);
-                    Console.WriteLine("  File system: {0}", d.DriveFormat);
-                    Console.WriteLine(
-                        "  Available space to current user:{0, 15} bytes",
-                        d.AvailableFreeSpace);
-
-                    Console.WriteLine(
-                        "  Total available space:          {0, 15} bytes",
-                        d.TotalFreeSpace);
-
-                    Console.WriteLine(
-                        "  Total size of drive:            {0, 15} bytes ",
-                        d.TotalSize);
-                }
-            }
-        }
-
-        public void Kitty(string[] arguments)
-        {
-            if (arguments.Length == 0)
-            {
-                Console.WriteLine("Kitty 0.0.1");
-                Console.WriteLine("\"We find the defendant kitty\"\n");
-                Help(new string[1] { "kitty" });
-            }
-            else if (arguments.Length > 1)
-            {
-                if (arguments[1] == "/r")
-                {
-                    if (int.TryParse(arguments[0].Split(":")[0], out int temp) && File.Exists(arguments[0]))
-                    {
-                        Console.WriteLine("Contents of " + arguments[0] + ":\n");
-                        string text = System.IO.File.ReadAllText(arguments[0]);
-                        Console.WriteLine(text);
-                    }
-                    else if (File.Exists(Directory.GetCurrentDirectory() + arguments[0]))
-                    {
-                        Console.WriteLine("Contents of " + Directory.GetCurrentDirectory() + arguments[0] + ":\n");
-                        string text = System.IO.File.ReadAllText(Directory.GetCurrentDirectory() + arguments[0]);
-                        Console.WriteLine(text);
-                    }
-                    else
-                    {
-                        Console.WriteLine("Error: this file does not exist");
-                    }
-                }
-                else if (arguments[1] == "/w")
-                {
-                    if (arguments.Length > 2)
-                    {
-                        if (int.TryParse(arguments[0].Split(":")[0], out int temp) && File.Exists(arguments[0]))
-                        {
-                            Console.WriteLine("Writing to " + arguments[0]);
-                            System.IO.File.WriteAllText(arguments[0], arguments[2]);
-                        }
-                        else if (File.Exists(Directory.GetCurrentDirectory() + arguments[0]))
-                        {
-                            Console.WriteLine("Writing to " + Directory.GetCurrentDirectory() + arguments[0]);
-                            System.IO.File.WriteAllText((Directory.GetCurrentDirectory() + arguments[0]), arguments[2]);
-                        }
-                        else
-                        {
-                            Console.WriteLine("Error: this file does not exist");
-                        }
-                    }
-                    else
-                    {
-                        Console.WriteLine("Error: No text to write to file");
-                    }
-                }
-                else if (arguments[1] == "/nf")
-                {
-                    if (int.TryParse(arguments[0].Split(":")[0], out int temp))
-                    {
-                        Console.WriteLine("Error: Please only use this to create a file in the current directory");
-                    }
-                    else
-                    {
-                        File.Create(Directory.GetCurrentDirectory() + arguments[0]);
-                    }
-                }
-                else
-                {
-                    Console.WriteLine("Error: Invalid switch.");
-                }
-            }
-            else
-            {
-                Console.WriteLine("Kitty 0.0.1");
-                Console.WriteLine("\"We find the defendant kitty\"\n");
-                Help(new string[1] { "kitty" });
-            }
-        }
-
-        public string[] GetFiles(string path)
-        {
-            string[] Files = new string[Directory.GetFiles(path).Length];
-            if (Files.Length > 0)
-                Files = Directory.GetFiles(path);
-            else
-                Files[0] = "No files found.";
-
-            return Files;
-        }
-
-        public string[] GetDirectories(string path)
-        {
-            string[] Directories = new string[Directory.GetDirectories(path).Length];
-            if (Directories.Length > 0)
-                Directories = Directory.GetDirectories(path);
-            else
-                Directories[0] = "No directories found.";
-
-            return Directories;
-        }
-
-        public void ChangeDirectory(string path)
-        {
-            if (path == null)
-            {
-                Console.Write(Directory.GetCurrentDirectory());
-            }
-            else if (path == "..")
-            {
-                string[] temp = Directory.GetCurrentDirectory().Split("\\");
-                string reconst = "";
-                if (temp.Length > 2)
-                {
-                    for (int i = 0; i < temp.Length - 2; i++)
-                    {
-                        reconst += temp[i] + "\\";
-                    }
-                    if (reconst.Substring(reconst.Length - 1) != "\\")
-                    {
-                        reconst += "\\";
-                    }
-                    Console.Write("Changing to " + reconst + "\n");
-                    Directory.SetCurrentDirectory(reconst);
-                }
-            }
-            else if (int.TryParse(path.Split(":")[0], out int temp))
-            {
-                if (Directory.Exists(path))
-                {
-                    if (path.Substring(path.Length - 1) != "\\")
-                    {
-                        path += "\\";
-                    }
-                    Directory.SetCurrentDirectory(path);
-                }
-                else
-                {
-                    Console.Write("Invalid directory.\n");
-                }
-            }
-            else
-            {
-                if (Directory.Exists(Directory.GetCurrentDirectory() + path))
-                {
-                    path = Directory.GetCurrentDirectory() + path;
-                    if (path.Substring(path.Length - 1) != "\\")
-                    {
-                        path += "\\";
-                    }
-                    Directory.SetCurrentDirectory(path);
-                }
-                else
-                {
-                    Console.Write("Invalid directory.\n");
-                }
-            }
-        }
-
-        protected void removeFile(string[] arguments)
-        {
-            if (arguments.Length >= 0)
-            {
-                if (int.TryParse(arguments[0].Split(":")[0], out int temp) && File.Exists(arguments[0]))
-                {
-                    File.Delete(arguments[0]);
-                    Console.WriteLine(arguments[0] + " deleted.");
-                }
-                else if (File.Exists(Directory.GetCurrentDirectory() + arguments[0]))
-                {
-                    File.Delete(Directory.GetCurrentDirectory() + arguments[0]);
-                    Console.WriteLine(Directory.GetCurrentDirectory() + arguments[0] + " deleted.");
-                }
-                else
-                {
-                    Console.WriteLine("Error: File does not exist");
-                }
-            }
-            else
-            {
-                Console.WriteLine("Error: This file does not exist");
-            }
-        }
-
-        protected void removeDirectory(string[] arguments)
-        {
-            if (arguments.Length >= 0)
-            {
-                if (int.TryParse(arguments[0].Split(":")[0], out int temp) && Directory.Exists(arguments[0]))
-                {
-                    if (directoryIsEmpty(arguments[0]))
-                    {
-                        Directory.Delete(arguments[0]);
-                    }
-                    else
-                    {
-                        Console.Write("Error: Directory is not empty.");
-                    }
-                }
-                else if (Directory.Exists(Directory.GetCurrentDirectory() + arguments[0]))
-                {
-                    if (directoryIsEmpty(Directory.GetCurrentDirectory() + arguments[0]))
-                    {
-                        Directory.Delete(Directory.GetCurrentDirectory() + arguments[0]);
-                    }
-                    else
-                    {
-                        Console.Write("Error: Directory is not empty.");
-                    }
-                }
-                else
-                {
-                    Console.Write("Error: This directory does not exist.");
-                }
-            }
-            else
-            {
-                Console.Write("Error: No directory was supplied.");
-            }
-        }
-
-        protected void createDirectory(string[] arguments)
-        {
-            if (arguments.Length >= 0)
-            {
-                Directory.CreateDirectory(arguments[0]);
-            }
-            else
-            {
-                Console.WriteLine("Error: No directory was supplied.");
-            }
-        }
-
-        public bool directoryIsEmpty(string path)
-        {
-            if (Directory.GetFiles(path).Length == 0 && Directory.GetDirectories(path).Length == 0)
-            {
-                return true;
-            }
-            else
-            {
-                return false;
-            }
-        }
-
         protected void CheckTime()
         {
             string time = DateTime.Now.ToString();
             Console.Write("{0}", time);
         }
 
-        protected void Calculate(string[] arguments)
-        {
-            if (arguments.Length == 3)
-            {
-                if (int.TryParse(arguments[0], out int intA) && int.TryParse(arguments[2], out int intB))
-                {
-                    if (arguments[1] == "+")
-                    {
-                        Console.Write(intA + intB);
-                    }
-                    else if (arguments[1] == "-")
-                    {
-                        Console.Write(intA - intB);
-                    }
-                    else if (arguments[1] == "*")
-                    {
-                        Console.Write(intA * intB);
-                    }
-                    else if (arguments[1] == "/")
-                    {
-                        Console.Write(intA / intB);
-                    }
-                    else if (arguments[1] == "%")
-                    {
-                        Console.Write(intA % intB);
-                    }
-                    else
-                    {
-                        Console.Write("Error: Invalid operator. Supported: +, -, *, /, %");
-                    }
-
-                }
-                else
-                {
-                    Console.Write("Error: One or both numbers are not valid. Is it a number?");
-                }
-            }
-            else
-            {
-                Console.Write("Error: Incorrect amount of arguments. Expects 3. Did you seperate the ints and operator with spaces?");
-            }
-        }
-
-        protected void Shutdown(string[] arguments)
-        {
-            if (arguments.Length > 0)
-            {
-                if (arguments[0] == "/r")
-                {
-                    Cosmos.System.Power.Reboot();
-                }
-                else
-                {
-                    Console.Write("Error: " + arguments[0] + " is not valid.");
-                }
-            }
-            Cosmos.System.Power.Shutdown();
-        }
-
-        protected void Help(string[] arguments)
+        public static void Help(string[] arguments)
         {
             // Tests if the arguments has the correct length
             if (arguments.Length >= 1)
@@ -628,6 +293,30 @@ namespace DremDOS
                     Console.WriteLine("mkdir - create an empty directory");
                     Console.WriteLine("mkdir <directory>");
                 }
+                else if (arguments[0] == "copy")
+                {
+                    Console.WriteLine("copy - copy a file");
+                    Console.WriteLine("copy <source> <destination>");
+                    Console.WriteLine("Note: Copy is currently very limited.");
+                }
+                else if (arguments[0] == "move")
+                {
+                    Console.WriteLine("move - move a file");
+                    Console.WriteLine("move <source> <destination>");
+                    Console.WriteLine("Note: currently doesn't work");
+                }
+                else if (arguments[0] == "initgui")
+                {
+                    Console.WriteLine("");
+                    Console.WriteLine("Usage: initgui [resolution]");
+                    Console.WriteLine("");
+                    Console.WriteLine("Available Resolutions:");
+                    Console.WriteLine("       640x480     800x600    1024x768");
+                    Console.WriteLine("      1280x720    1366x768    1920x1080");
+                    Console.WriteLine("");
+                    Console.WriteLine("Example: initgui 800x600");
+                    Console.WriteLine("");
+                }
                 else // Display the default help menu if the command requested in the first argument isn't valid
                 {
                     Console.Write("DremDOS Help Menu\n\n");
@@ -644,6 +333,9 @@ namespace DremDOS
                     Console.Write("rm - remove a file from the drive\n");
                     Console.Write("rmdir - remove an empty directory\n");
                     Console.Write("mkdir - create an empty directory\n");
+                    Console.Write("copy - copy a file\n");
+                    Console.Write("move - move a file\n");
+                    Console.Write("initgui - start the experimental desktop environment\n");
                     Console.Write("help - help menu or get help on a command\n\n");
                     Console.Write("Tip: Try help <command>");
                 }
@@ -665,6 +357,9 @@ namespace DremDOS
                 Console.Write("rm - remove a file from the drive\n");
                 Console.Write("rmdir - remove an empty directory\n");
                 Console.Write("mkdir - create an empty directory\n");
+                Console.Write("copy - copy a file");
+                Console.Write("move - move a file");
+                Console.Write("initgui - start the experimental desktop environment\n");
                 Console.Write("help - help menu or get help on a command\n\n");
                 Console.Write("Tip: Try help <command>");
             }
