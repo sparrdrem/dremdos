@@ -1,3 +1,6 @@
+# NOTICE
+This repo has been moved to [my Gitea server](https://git.innovation-inc.org/Innovation/dremdos/). Please go there for updated code!
+
 # DremDOS - a tiny disk operating system built with COSMOS
 
 ## What is DremDOS?
